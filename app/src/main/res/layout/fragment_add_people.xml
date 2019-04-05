@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="people"
+            type="com.raywenderlich.android.imet.ui.add.AddPeopleViewModel"/>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/default_padding">
+
+            <ImageView
+                android:id="@+id/imageViewIcon"
+                android:layout_width="@dimen/profile_image_size"
+                android:layout_height="@dimen/profile_image_size"
+                android:layout_gravity="center_horizontal"
+                app:srcCompat="@drawable/ic_profile_image"
+                tools:ignore="VectorDrawableCompat" />
+
+            <android.support.v7.widget.CardView android:id="@+id/fieldHolder"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/default_margin"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardview_light_background"
+                app:cardCornerRadius="@dimen/cardview_default_radius"
+                app:cardElevation="@dimen/cardview_default_elevation">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/default_padding">
+
+
+                    <EditText
+                        android:id="@+id/textEditName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_name"
+                        android:inputType="textPersonName"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:backgroundTint="@color/primary_background_color_selector"
+                        android:text="@{people.name}"/>
+
+
+                    <EditText
+                        android:id="@+id/textEditMetAt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_met_at"
+                        android:inputType="textPostalAddress"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:text="@{people.metAt}"/>
+
+
+                    <EditText
+                        android:id="@+id/textEditContact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_contact"
+                        android:inputType="phone"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:text="@{people.contact}"/>
+
+
+                    <EditText
+                        android:id="@+id/textEditEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_email"
+                        android:inputType="textEmailAddress"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:text="@{people.email}"/>
+
+
+                    <EditText
+                        android:id="@+id/textEditFacebook"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_facebook"
+                        android:inputType="textUri"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:text="@{people.facebook}"/>
+
+
+                    <EditText
+                        android:id="@+id/textEditTwitter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_twitter"
+                        android:inputType="textUri"
+                        android:lines="1"
+                        android:textColor="@color/primary_text_color_selector"
+                        android:text="@{people.twitter}"/>
+
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addFab"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            app:srcCompat="@drawable/ic_add"
+            app:useCompatPadding="true"
+            tools:ignore="VectorDrawableCompat" />
+    </RelativeLayout>
+</layout>
