@@ -37,11 +37,8 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.Transformations
-import android.databinding.BaseObservable
 import android.databinding.ObservableField
-import android.util.Log
 import com.raywenderlich.android.imet.IMetApp
 import com.raywenderlich.android.imet.data.model.People
 
@@ -70,10 +67,9 @@ class AddPeopleViewModel(application: Application) : AndroidViewModel(applicatio
   // Maps people id to people details
   fun getPeopleDetails(id: Int): LiveData<People> {
     peopleId.value = id
-    val peopleDetails = Transformations.switchMap<Int, People>(peopleId) { id ->
+    return Transformations.switchMap(peopleId) {
       peopleRepository.findPeople(id)
     }
-    return peopleDetails
   }
 
   // call this method to bind all fields to views

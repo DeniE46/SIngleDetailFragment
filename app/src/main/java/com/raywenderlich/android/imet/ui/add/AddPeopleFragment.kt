@@ -33,11 +33,8 @@
 
 package com.raywenderlich.android.imet.ui.add
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
-import android.databinding.ObservableField
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -49,149 +46,131 @@ import com.raywenderlich.android.imet.R
 import com.raywenderlich.android.imet.data.model.People
 import com.raywenderlich.android.imet.databinding.FragmentAddPeopleBinding
 import kotlinx.android.synthetic.main.fragment_add_people.*
-import kotlinx.android.synthetic.main.fragment_add_people.view.*
 
 /**
  * The Fragment to add people
  */
 class AddPeopleFragment : Fragment(), View.OnClickListener {
 
-  private lateinit var viewModel: AddPeopleViewModel
-  private var viewMode = false
-  private var areFieldsLocked = true
+    private lateinit var viewModel: AddPeopleViewModel
+    private var viewMode = false
+    private var areFieldsLocked = true
+    private var v: FragmentAddPeopleBinding? = null
 
 
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    viewModel = ViewModelProviders.of(this).get(AddPeopleViewModel::class.java)
-  }
-
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-
-      val vv = DataBindingUtil.inflate<FragmentAddPeopleBinding>(inflater,R.layout.fragment_add_people, container, false)
-    //val v = inflater.inflate(R.layout.fragment_add_people, container, false)
-
-    vv.setVariable(BR.people, viewModel)
-
-    vv.addFab.setOnClickListener(this)
-
-    if(arguments?.containsKey("VIEW_EDIT_MODE")==true){
-      //user entered into view/edit mode so set to true
-      viewMode = true
-      setTitle(getString(R.string.detail_fragment_view))
-      val peopleId = arguments?.getInt(getString(R.string.people_id))
-      provideData(peopleId)
-    }else{
-      //user entered into add mode so set to false
-      viewMode = false
-      setTitle(getString(R.string.detail_fragment_add))
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProviders.of(this).get(AddPeopleViewModel::class.java)
     }
-    return vv.root
-  }
 
-  override fun onResume() {
-    super.onResume()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
 
-  }
+        v = DataBindingUtil.inflate(inflater, R.layout.fragment_add_people, container, false)
+        v?.setVariable(BR.people, viewModel)
 
-  override fun onClick(v: View?) {
-    when(v?.id){
-      addFab.id -> {
-        fabButtonConfig()
-      }
+        v?.addFab?.setOnClickListener(this)
+
+        if (arguments?.containsKey("VIEW_EDIT_MODE") == true) {
+            //user entered into view/edit mode so set to true
+            viewMode = true
+            setTitle(getString(R.string.detail_fragment_view))
+            lockFields()
+            val peopleId = arguments?.getInt(getString(R.string.people_id))
+            provideData(peopleId)
+        } else {
+            //user entered into add mode so set to false
+            viewMode = false
+            setTitle(getString(R.string.detail_fragment_add))
+        }
+
+        return v?.root
     }
-  }
 
-  private fun fabButtonConfig(){
-    //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
-    if(viewMode){
-      if(areFieldsLocked){
-        areFieldsLocked = false
-        setTitle(getString(R.string.detail_fragment_edit))
-        unlockFields()
-      }
-      else{
-        areFieldsLocked = true
-        lockFields()
-        savePeopleInfo()
-      }
-    }else{
-      savePeopleInfo()
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            addFab.id -> {
+                fabButtonConfig()
+            }
+        }
     }
-  }
 
-  private fun provideData(peopleId:Int?){
-    peopleId?.let {
-      viewModel.getPeopleDetails(peopleId).observe(this, Observer { peopleDetails ->
-        populatePeopleDetails(peopleDetails)
-        lockFields()
-        Toast.makeText(activity, "got person id:" + peopleDetails?.id, Toast.LENGTH_SHORT).show()
-      })
+
+    private fun fabButtonConfig() {
+        //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
+        if (viewMode) {
+            if (areFieldsLocked) {
+                areFieldsLocked = false
+                setTitle(getString(R.string.detail_fragment_edit))
+                unlockFields()
+            } else {
+                areFieldsLocked = true
+                lockFields()
+                savePeopleInfo()
+            }
+        } else {
+            savePeopleInfo()
+        }
     }
-  }
 
 
-  /**
-   * Saves people info from user input and returns to PeopleListActivity
-   */
-  private fun savePeopleInfo() {
-    val people = People(
-        textEditName.text.toString(),
-        textEditMetAt.text.toString(),
-        textEditContact.text.toString(),
-        textEditEmail.text.toString(),
-        textEditFacebook.text.toString(),
-        textEditTwitter.text.toString()
-    )
+    private fun provideData(peopleId: Int?) {
+        peopleId?.let {
+            viewModel.getPeopleDetailsBind(peopleId)
+            lockFields()
+        }
 
-    if(viewMode){
-      people.id = arguments?.getInt(getString(R.string.people_id))!!
-      viewModel.updatePeople(people)
-      Toast.makeText(activity, "updating person", Toast.LENGTH_SHORT).show()
     }
-    else{
-      viewModel.addPeople(people)
-      Toast.makeText(activity, "adding new person", Toast.LENGTH_SHORT).show()
+
+
+    /**
+     * Saves people info from user input and returns to PeopleListActivity
+     */
+    private fun savePeopleInfo() {
+        val people = People(
+                textEditName.text.toString(),
+                textEditMetAt.text.toString(),
+                textEditContact.text.toString(),
+                textEditEmail.text.toString(),
+                textEditFacebook.text.toString(),
+                textEditTwitter.text.toString()
+        )
+
+        if (viewMode) {
+            people.id = arguments?.getInt(getString(R.string.people_id))!!
+            viewModel.updatePeople(people)
+            Toast.makeText(activity, "updating person", Toast.LENGTH_SHORT).show()
+        } else {
+            viewModel.addPeople(people)
+            Toast.makeText(activity, "adding new person", Toast.LENGTH_SHORT).show()
+        }
+        Navigation.findNavController(view!!).navigateUp()
     }
-    Navigation.findNavController(view!!).navigateUp()
-  }
 
 
+    private fun lockFields() {
+        v?.textEditName?.isEnabled = false
+        v?.textEditMetAt?.isEnabled = false
+        v?.textEditContact?.isEnabled = false
+        v?.textEditEmail?.isEnabled = false
+        v?.textEditFacebook?.isEnabled = false
+        v?.textEditTwitter?.isEnabled = false
+        Toast.makeText(activity, "View mode...", Toast.LENGTH_SHORT).show()
+    }
 
+    private fun unlockFields() {
+        v?.textEditName?.isEnabled = true
+        v?.textEditMetAt?.isEnabled = true
+        v?.textEditContact?.isEnabled = true
+        v?.textEditEmail?.isEnabled = true
+        v?.textEditFacebook?.isEnabled = true
+        v?.textEditTwitter?.isEnabled = true
+        Toast.makeText(activity, "Edit mode...", Toast.LENGTH_SHORT).show()
+    }
 
-  private fun populatePeopleDetails(people: People?) {
-    textEditName.setText(people?.name)
-    textEditMetAt.setText(people?.metAt)
-    textEditContact.setText(people?.contact)
-    textEditEmail.setText(people?.email)
-    textEditFacebook.setText(people?.facebook)
-    textEditTwitter.setText(people?.twitter)
-  }
-
-  private fun lockFields() {
-    textEditName.isEnabled = false
-    textEditMetAt.isEnabled = false
-    textEditContact.isEnabled = false
-    textEditEmail.isEnabled = false
-    textEditFacebook.isEnabled = false
-    textEditTwitter.isEnabled = false
-    Toast.makeText(activity, "View mode...", Toast.LENGTH_SHORT).show()
-  }
-
-  private fun unlockFields() {
-    textEditName.isEnabled = true
-    textEditMetAt.isEnabled = true
-    textEditContact.isEnabled = true
-    textEditEmail.isEnabled = true
-    textEditFacebook.isEnabled = true
-    textEditTwitter.isEnabled = true
-    Toast.makeText(activity, "Edit mode...", Toast.LENGTH_SHORT).show()
-  }
-
-  private fun setTitle(title:String){
-    (activity as AppCompatActivity).supportActionBar?.title = title
-  }
+    private fun setTitle(title: String) {
+        (activity as AppCompatActivity).supportActionBar?.title = title
+    }
 
 }
