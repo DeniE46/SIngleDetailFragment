@@ -41,7 +41,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.Toast
 import androidx.navigation.Navigation
-import com.raywenderlich.android.imet.BR
 import com.raywenderlich.android.imet.R
 import com.raywenderlich.android.imet.data.model.People
 import com.raywenderlich.android.imet.databinding.FragmentAddPeopleBinding
@@ -66,8 +65,14 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        v = DataBindingUtil.inflate(inflater, R.layout.fragment_add_people, container, false)
-        v?.setVariable(BR.people, viewModel)
+//        v = DataBindingUtil.inflate(inflater, R.layout.fragment_add_people, container, false)
+//        v?.setVariable(BR.people, viewModel)
+
+        v = DataBindingUtil.inflate<FragmentAddPeopleBinding>(inflater, R.layout.fragment_add_people, container, false)
+                .apply {
+                    this.lifecycleOwner = this@AddPeopleFragment
+                    this.people = viewModel
+                }
 
         v?.addFab?.setOnClickListener(this)
 
@@ -75,13 +80,14 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
             //user entered into view/edit mode so set to true
             viewMode = true
             setTitle(getString(R.string.detail_fragment_view))
-            lockFields()
             val peopleId = arguments?.getInt(getString(R.string.people_id))
             provideData(peopleId)
         } else {
             //user entered into add mode so set to false
             viewMode = false
+            viewModel.enableDisableFields(viewMode)
             setTitle(getString(R.string.detail_fragment_add))
+            Toast.makeText(activity, "Add new mode...", Toast.LENGTH_SHORT).show()
         }
 
         return v?.root
@@ -91,26 +97,27 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             addFab.id -> {
-                fabButtonConfig()
+                configActivity()
+                viewModel.enableDisableFields(viewMode)
             }
         }
     }
 
 
-    private fun fabButtonConfig() {
+    private fun configActivity() {
         //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
         if (viewMode) {
             if (areFieldsLocked) {
                 areFieldsLocked = false
                 setTitle(getString(R.string.detail_fragment_edit))
-                unlockFields()
+                Toast.makeText(activity, "Edit mode...", Toast.LENGTH_SHORT).show()
             } else {
                 areFieldsLocked = true
-                lockFields()
-                savePeopleInfo()
+                Toast.makeText(activity, "View mode...", Toast.LENGTH_SHORT).show()
+                displayFormMode()
             }
         } else {
-            savePeopleInfo()
+            displayFormMode()
         }
     }
 
@@ -118,56 +125,23 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
     private fun provideData(peopleId: Int?) {
         peopleId?.let {
             viewModel.getPeopleDetailsBind(peopleId)
-            lockFields()
         }
-
     }
 
 
     /**
      * Saves people info from user input and returns to PeopleListActivity
      */
-    private fun savePeopleInfo() {
-        val people = People(
-                textEditName.text.toString(),
-                textEditMetAt.text.toString(),
-                textEditContact.text.toString(),
-                textEditEmail.text.toString(),
-                textEditFacebook.text.toString(),
-                textEditTwitter.text.toString()
-        )
-
+    private fun displayFormMode() {
         if (viewMode) {
-            people.id = arguments?.getInt(getString(R.string.people_id))!!
-            viewModel.updatePeople(people)
             Toast.makeText(activity, "updating person", Toast.LENGTH_SHORT).show()
         } else {
-            viewModel.addPeople(people)
             Toast.makeText(activity, "adding new person", Toast.LENGTH_SHORT).show()
         }
+        viewModel.savePeopleInfo(viewMode, arguments?.getInt(getString(R.string.people_id))!!)
         Navigation.findNavController(view!!).navigateUp()
     }
 
-
-    private fun lockFields() {
-        v?.textEditName?.isEnabled = false
-        v?.textEditMetAt?.isEnabled = false
-        v?.textEditContact?.isEnabled = false
-        v?.textEditEmail?.isEnabled = false
-        v?.textEditFacebook?.isEnabled = false
-        v?.textEditTwitter?.isEnabled = false
-        Toast.makeText(activity, "View mode...", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun unlockFields() {
-        v?.textEditName?.isEnabled = true
-        v?.textEditMetAt?.isEnabled = true
-        v?.textEditContact?.isEnabled = true
-        v?.textEditEmail?.isEnabled = true
-        v?.textEditFacebook?.isEnabled = true
-        v?.textEditTwitter?.isEnabled = true
-        Toast.makeText(activity, "Edit mode...", Toast.LENGTH_SHORT).show()
-    }
 
     private fun setTitle(title: String) {
         (activity as AppCompatActivity).supportActionBar?.title = title

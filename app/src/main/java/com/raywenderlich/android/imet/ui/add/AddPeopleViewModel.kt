@@ -38,20 +38,21 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.databinding.ObservableField
+import android.databinding.ObservableBoolean
 import com.raywenderlich.android.imet.IMetApp
 import com.raywenderlich.android.imet.data.model.People
 
-class AddPeopleViewModel(application: Application) : AndroidViewModel(application) {
+class AddPeopleViewModel(application: Application) : AndroidViewModel(application){
 
   private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
   private val peopleId = MutableLiveData<Int>()
-  var name = ObservableField<String>()
-  var metAt = ObservableField<String>()
-  var contact = ObservableField<String>()
-  var email = ObservableField<String>()
-  var facebook = ObservableField<String>()
-  val twitter = ObservableField<String>()
+  var name = MutableLiveData<String>()
+  var metAt = MutableLiveData<String>()
+  var contact = MutableLiveData<String>()
+  var email = MutableLiveData<String>()
+  var facebook = MutableLiveData<String>()
+  val twitter = MutableLiveData<String>()
+  var areFieldsEnabled = ObservableBoolean()
 
 
 
@@ -75,15 +76,46 @@ class AddPeopleViewModel(application: Application) : AndroidViewModel(applicatio
   // call this method to bind all fields to views
   fun getPeopleDetailsBind(id: Int){
     peopleRepository.findPeople(id).observeForever{
-      name.set(it?.name)
-      metAt.set(it?.metAt)
-      contact.set(it?.contact)
-      email.set(it?.email)
-      facebook.set(it?.facebook)
-      twitter.set(it?.twitter)
+      name.value=it?.name
+      metAt.value=it?.metAt
+      contact.value=it?.contact
+      email.value=it?.email
+      facebook.value=it?.facebook
+      twitter.value=it?.twitter
+    }
+  }
+
+  fun enableDisableFields(viewMode:Boolean) {
+    //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
+    if (viewMode) {
+      if (areFieldsEnabled.get()) {
+        areFieldsEnabled.set(false)
+      } else {
+        areFieldsEnabled.set(true)
+      }
+    }
+    else{
+      areFieldsEnabled.set(true)
     }
   }
 
 
+  fun savePeopleInfo(viewMode: Boolean, peopleId:Int) {
+    val people = People(
+            name.value!!,
+            metAt.value!!,
+            contact.value!!,
+            email.value!!,
+            facebook.value!!,
+            twitter.value!!
+    )
+
+    if (viewMode) {
+      people.id = peopleId
+      updatePeople(people)
+    } else {
+      addPeople(people)
+    }
+  }
 
 }
