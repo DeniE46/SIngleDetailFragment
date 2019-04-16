@@ -121,7 +121,8 @@
                         android:lines="1"
                         android:textColor="@color/primary_text_color_selector"
                         android:text="@={people.twitter}"
-                        android:enabled="@{people.areFieldsEnabled}"/>
+                        android:enabled="@{people.areFieldsEnabled}"
+                        />
 
 
                 </LinearLayout>
@@ -138,6 +139,7 @@
             android:layout_alignParentBottom="true"
             app:srcCompat="@drawable/ic_add"
             app:useCompatPadding="true"
-            tools:ignore="VectorDrawableCompat" />
+            tools:ignore="VectorDrawableCompat"
+            android:onClick="@{()-> people.onFabClick()}"/>
     </RelativeLayout>
 </layout>

@@ -38,84 +38,99 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.databinding.ObservableBoolean
+import android.util.Log
+import com.raywenderlich.android.imet.Event
 import com.raywenderlich.android.imet.IMetApp
 import com.raywenderlich.android.imet.data.model.People
 
-class AddPeopleViewModel(application: Application) : AndroidViewModel(application){
+class AddPeopleViewModel(application: Application) : AndroidViewModel(application) {
 
-  private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
-  private val peopleId = MutableLiveData<Int>()
-  var name = MutableLiveData<String>()
-  var metAt = MutableLiveData<String>()
-  var contact = MutableLiveData<String>()
-  var email = MutableLiveData<String>()
-  var facebook = MutableLiveData<String>()
-  val twitter = MutableLiveData<String>()
-  var areFieldsEnabled = ObservableBoolean()
+    private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
+    private val peopleId = MutableLiveData<Int>()
+
+    var name = MutableLiveData<String>()
+    var metAt = MutableLiveData<String>()
+    var contact = MutableLiveData<String>()
+    var email = MutableLiveData<String>()
+    var facebook = MutableLiveData<String>()
+    val twitter = MutableLiveData<String>()
+    var areFieldsEnabled = MutableLiveData<Boolean>()
+
+
+    private val _navigateToDetails = MutableLiveData<Event<Boolean>>()
+
+    val navigateToDetails : LiveData<Event<Boolean>>
+        get() = _navigateToDetails
 
 
 
 
-  fun addPeople(people: People) {
-    peopleRepository.insertPeople(people)
-  }
-
-  fun updatePeople(people:People){
-    peopleRepository.updatePeople(people)
-  }
-
-  // Maps people id to people details
-  fun getPeopleDetails(id: Int): LiveData<People> {
-    peopleId.value = id
-    return Transformations.switchMap(peopleId) {
-      peopleRepository.findPeople(id)
+    fun addPeople(people: People) {
+        peopleRepository.insertPeople(people)
     }
-  }
 
-  // call this method to bind all fields to views
-  fun getPeopleDetailsBind(id: Int){
-    peopleRepository.findPeople(id).observeForever{
-      name.value=it?.name
-      metAt.value=it?.metAt
-      contact.value=it?.contact
-      email.value=it?.email
-      facebook.value=it?.facebook
-      twitter.value=it?.twitter
+    fun updatePeople(people: People) {
+        peopleRepository.updatePeople(people)
     }
-  }
 
-  fun enableDisableFields(viewMode:Boolean) {
-    //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
-    if (viewMode) {
-      if (areFieldsEnabled.get()) {
-        areFieldsEnabled.set(false)
-      } else {
-        areFieldsEnabled.set(true)
-      }
+    // Maps people id to people details
+    fun getPeopleDetails(id: Int): LiveData<People> {
+        peopleId.value = id
+        return Transformations.switchMap(peopleId) {
+            peopleRepository.findPeople(id)
+        }
     }
-    else{
-      areFieldsEnabled.set(true)
+
+    // call this method to bind all fields to views
+    fun getPeopleDetailsBind(id: Int) {
+        peopleId.value = id
+        peopleRepository.findPeople(id).observeForever {
+            name.value = it?.name
+            metAt.value = it?.metAt
+            contact.value = it?.contact
+            email.value = it?.email
+            facebook.value = it?.facebook
+            twitter.value = it?.twitter
+        }
     }
-  }
 
-
-  fun savePeopleInfo(viewMode: Boolean, peopleId:Int) {
-    val people = People(
-            name.value!!,
-            metAt.value!!,
-            contact.value!!,
-            email.value!!,
-            facebook.value!!,
-            twitter.value!!
-    )
-
-    if (viewMode) {
-      people.id = peopleId
-      updatePeople(people)
-    } else {
-      addPeople(people)
+    fun enableDisableFields() {
+        //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
+        if (areFieldsEnabled.value == true) {
+            areFieldsEnabled.value = false
+            savePeopleInfo()
+        } else {
+            areFieldsEnabled.value = true
+        }
     }
-  }
+
+
+    private fun savePeopleInfo() {
+        val people = People(
+                name.value!!,
+                metAt.value!!,
+                contact.value!!,
+                email.value!!,
+                facebook.value!!,
+                twitter.value!!
+        )
+
+
+        if (peopleId.value == null) {
+            Log.d("TAG", "id not set, add person")
+            addPeople(people)
+
+        } else {
+            Log.d("TAG", "update person")
+            val t = peopleId.value
+            people.id = t!!
+            updatePeople(people)
+        }
+    }
+
+    fun onFabClick() {
+        enableDisableFields()
+        _navigateToDetails.value = Event(areFieldsEnabled.value!!)
+    }
 
 }

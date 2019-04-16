@@ -33,11 +33,13 @@
 
 package com.raywenderlich.android.imet.ui.add
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.navigation.Navigation
@@ -49,12 +51,12 @@ import kotlinx.android.synthetic.main.fragment_add_people.*
 /**
  * The Fragment to add people
  */
-class AddPeopleFragment : Fragment(), View.OnClickListener {
+class AddPeopleFragment : Fragment() {
+
 
     private lateinit var viewModel: AddPeopleViewModel
     private var viewMode = false
     private var areFieldsLocked = true
-    private var v: FragmentAddPeopleBinding? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,17 +67,6 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-//        v = DataBindingUtil.inflate(inflater, R.layout.fragment_add_people, container, false)
-//        v?.setVariable(BR.people, viewModel)
-
-        v = DataBindingUtil.inflate<FragmentAddPeopleBinding>(inflater, R.layout.fragment_add_people, container, false)
-                .apply {
-                    this.lifecycleOwner = this@AddPeopleFragment
-                    this.people = viewModel
-                }
-
-        v?.addFab?.setOnClickListener(this)
-
         if (arguments?.containsKey("VIEW_EDIT_MODE") == true) {
             //user entered into view/edit mode so set to true
             viewMode = true
@@ -85,29 +76,26 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
         } else {
             //user entered into add mode so set to false
             viewMode = false
-            viewModel.enableDisableFields(viewMode)
+            viewModel.enableDisableFields()
             setTitle(getString(R.string.detail_fragment_add))
             Toast.makeText(activity, "Add new mode...", Toast.LENGTH_SHORT).show()
         }
 
-        return v?.root
+        viewModel.navigateToDetails.observe(this, Observer { configActivity(it!!.peekContent()) })
+
+        return DataBindingUtil.inflate<FragmentAddPeopleBinding>(inflater, R.layout.fragment_add_people, container, false)
+                .apply {
+                    this.lifecycleOwner = this@AddPeopleFragment
+                    this.people = viewModel
+                }.root
     }
 
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            addFab.id -> {
-                configActivity()
-                viewModel.enableDisableFields(viewMode)
-            }
-        }
-    }
 
-
-    private fun configActivity() {
+    private fun configActivity(fieldsLocked: Boolean?) {
         //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
         if (viewMode) {
-            if (areFieldsLocked) {
+            if (fieldsLocked == true) {
                 areFieldsLocked = false
                 setTitle(getString(R.string.detail_fragment_edit))
                 Toast.makeText(activity, "Edit mode...", Toast.LENGTH_SHORT).show()
@@ -129,16 +117,12 @@ class AddPeopleFragment : Fragment(), View.OnClickListener {
     }
 
 
-    /**
-     * Saves people info from user input and returns to PeopleListActivity
-     */
     private fun displayFormMode() {
         if (viewMode) {
             Toast.makeText(activity, "updating person", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(activity, "adding new person", Toast.LENGTH_SHORT).show()
         }
-        viewModel.savePeopleInfo(viewMode, arguments?.getInt(getString(R.string.people_id))!!)
         Navigation.findNavController(view!!).navigateUp()
     }
 
