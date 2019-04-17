@@ -16,6 +16,6 @@
   </fragment>
   <fragment
     android:id="@+id/addPeopleFragment"
-    android:name="com.raywenderlich.android.imet.ui.add.AddPeopleFragment"
-    tools:layout="@layout/fragment_add_people" />
+    android:name="com.raywenderlich.android.imet.ui.add.DetailsPeopleFragment"
+    tools:layout="@layout/fragment_detail_people" />
 </navigation>

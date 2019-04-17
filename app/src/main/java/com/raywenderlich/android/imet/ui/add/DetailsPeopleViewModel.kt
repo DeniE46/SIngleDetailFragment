@@ -37,13 +37,15 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.util.Log
 import com.raywenderlich.android.imet.Event
 import com.raywenderlich.android.imet.IMetApp
 import com.raywenderlich.android.imet.data.model.People
+import android.databinding.BindingAdapter
+import android.support.design.widget.FloatingActionButton
 
-class AddPeopleViewModel(application: Application) : AndroidViewModel(application) {
+
+class DetailsPeopleViewModel(application: Application) : AndroidViewModel(application) {
 
     private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
     private val peopleId = MutableLiveData<Int>()
@@ -57,29 +59,10 @@ class AddPeopleViewModel(application: Application) : AndroidViewModel(applicatio
     var areFieldsEnabled = MutableLiveData<Boolean>()
 
 
-    private val _navigateToDetails = MutableLiveData<Event<Boolean>>()
+    private val _navigateToList = MutableLiveData<Event<Boolean>>()
+    val navigateToList: LiveData<Event<Boolean>>
+        get() = _navigateToList
 
-    val navigateToDetails : LiveData<Event<Boolean>>
-        get() = _navigateToDetails
-
-
-
-
-    fun addPeople(people: People) {
-        peopleRepository.insertPeople(people)
-    }
-
-    fun updatePeople(people: People) {
-        peopleRepository.updatePeople(people)
-    }
-
-    // Maps people id to people details
-    fun getPeopleDetails(id: Int): LiveData<People> {
-        peopleId.value = id
-        return Transformations.switchMap(peopleId) {
-            peopleRepository.findPeople(id)
-        }
-    }
 
     // call this method to bind all fields to views
     fun getPeopleDetailsBind(id: Int) {
@@ -93,6 +76,7 @@ class AddPeopleViewModel(application: Application) : AndroidViewModel(applicatio
             twitter.value = it?.twitter
         }
     }
+
 
     fun enableDisableFields() {
         //control logic for lock, unlock and save fields when in View/Edit and save when in Add mode
@@ -111,26 +95,35 @@ class AddPeopleViewModel(application: Application) : AndroidViewModel(applicatio
                 metAt.value!!,
                 contact.value!!,
                 email.value!!,
-                facebook.value!!,
-                twitter.value!!
+                facebook.value,
+                twitter.value
         )
-
-
         if (peopleId.value == null) {
             Log.d("TAG", "id not set, add person")
-            addPeople(people)
-
+            peopleRepository.insertPeople(people)
         } else {
             Log.d("TAG", "update person")
-            val t = peopleId.value
-            people.id = t!!
-            updatePeople(people)
+            people.id = peopleId.value!!
+            peopleRepository.updatePeople(people)
         }
     }
 
+
     fun onFabClick() {
         enableDisableFields()
-        _navigateToDetails.value = Event(areFieldsEnabled.value!!)
+        _navigateToList.value = Event(areFieldsEnabled.value!!)
     }
+
+
+    companion object {
+        @BindingAdapter("android:waitName", "android:waitMetaAt", "android:waitContact", "android:waitEmail", requireAll = false)
+        @JvmStatic
+        fun testFab(fab: FloatingActionButton, name: String?, metAt: String?, contact: String?, email: String?) {
+
+            fab.isEnabled = !(name.isNullOrEmpty() || metAt.isNullOrEmpty() || contact.isNullOrEmpty() || email.isNullOrEmpty())
+
+        }
+    }
+
 
 }

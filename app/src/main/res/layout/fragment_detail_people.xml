@@ -7,13 +7,14 @@
     <data>
         <variable
             name="people"
-            type="com.raywenderlich.android.imet.ui.add.AddPeopleViewModel"/>
+            type="com.raywenderlich.android.imet.ui.add.DetailsPeopleViewModel"/>
 
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -121,8 +122,7 @@
                         android:lines="1"
                         android:textColor="@color/primary_text_color_selector"
                         android:text="@={people.twitter}"
-                        android:enabled="@{people.areFieldsEnabled}"
-                        />
+                        android:enabled="@{people.areFieldsEnabled}" />
 
 
                 </LinearLayout>
@@ -132,6 +132,10 @@
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
+            android:waitName="@{people.name}"
+            android:waitMetaAt="@{people.metAt}"
+            android:waitContact="@{people.contact}"
+            android:waitEmail="@{people.email}"
             android:id="@+id/addFab"
             android:layout_width="64dp"
             android:layout_height="wrap_content"
@@ -140,6 +144,7 @@
             app:srcCompat="@drawable/ic_add"
             app:useCompatPadding="true"
             tools:ignore="VectorDrawableCompat"
-            android:onClick="@{()-> people.onFabClick()}"/>
+            android:onClick="@{()-> people.onFabClick()}"
+            />
     </RelativeLayout>
 </layout>

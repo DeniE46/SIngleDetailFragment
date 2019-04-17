@@ -42,7 +42,7 @@ data class People(
     var metAt: String = "",
     var contact: String = "",
     var email: String = "",
-    var facebook: String = "",
-    var twitter: String = "",
+    var facebook: String? = "",
+    var twitter: String? = "",
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 )
