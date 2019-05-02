@@ -34,7 +34,6 @@
 package com.raywenderlich.android.imet.ui.list
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
@@ -43,6 +42,7 @@ import androidx.navigation.findNavController
 import com.raywenderlich.android.imet.R
 import com.raywenderlich.android.imet.data.model.People
 import kotlinx.android.synthetic.main.fragment_peoples_list.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * The Fragment to show people list
@@ -53,12 +53,12 @@ class PeoplesListFragment : Fragment(),
     SearchView.OnCloseListener {
 
   private lateinit var searchView: SearchView
-  private lateinit var viewModel: PeoplesListViewModel
+
+  private val viewModel: PeoplesListViewModel by viewModel()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
-    viewModel = ViewModelProviders.of(this).get(PeoplesListViewModel::class.java)
   }
 
   override fun onCreateView(

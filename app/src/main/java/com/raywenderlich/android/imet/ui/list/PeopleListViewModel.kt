@@ -33,16 +33,15 @@
 
 package com.raywenderlich.android.imet.ui.list
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
-import com.raywenderlich.android.imet.IMetApp
+import android.arch.lifecycle.ViewModel
+import com.raywenderlich.android.imet.data.PeopleRepository
 import com.raywenderlich.android.imet.data.model.People
 
-class PeoplesListViewModel(application: Application) : AndroidViewModel(application) {
+class PeoplesListViewModel(repository: PeopleRepository) : ViewModel() {
 
-  private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
+  private val peopleRepository = repository
   private val peopleList = MediatorLiveData<List<People>>()
 
   init {

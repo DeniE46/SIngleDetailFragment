@@ -33,21 +33,21 @@
 
 package com.raywenderlich.android.imet.ui.add
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.raywenderlich.android.imet.Event
-import com.raywenderlich.android.imet.IMetApp
 import com.raywenderlich.android.imet.data.model.People
 import android.databinding.BindingAdapter
 import android.support.design.widget.FloatingActionButton
+import com.raywenderlich.android.imet.R
+import com.raywenderlich.android.imet.data.PeopleRepository
 
 
-class DetailsPeopleViewModel(application: Application) : AndroidViewModel(application) {
+class DetailsPeopleViewModel(repository: PeopleRepository) : ViewModel() {
 
-    private val peopleRepository = getApplication<IMetApp>().getPeopleRepository()
+    private val peopleRepository = repository
     private val peopleId = MutableLiveData<Int>()
 
     var name = MutableLiveData<String>()
@@ -116,9 +116,17 @@ class DetailsPeopleViewModel(application: Application) : AndroidViewModel(applic
 
 
     companion object {
-        @BindingAdapter("android:waitName", "android:waitMetaAt", "android:waitContact", "android:waitEmail", requireAll = false)
+        @BindingAdapter("android:waitName", "android:waitMetaAt", "android:waitContact", "android:waitEmail", "android:fieldsState", requireAll = false)
         @JvmStatic
-        fun testFab(fab: FloatingActionButton, name: String?, metAt: String?, contact: String?, email: String?) {
+        fun testFab(fab: FloatingActionButton, name: String?, metAt: String?, contact: String?, email: String?, areFieldsEnabled: Boolean?) {
+
+            if(areFieldsEnabled == true){
+                fab.setImageResource(R.drawable.ic_done)
+            }
+            else{
+                fab.setImageResource(R.drawable.ic_edit)
+            }
+
 
             fab.isEnabled = !(name.isNullOrEmpty() || metAt.isNullOrEmpty() || contact.isNullOrEmpty() || email.isNullOrEmpty())
 

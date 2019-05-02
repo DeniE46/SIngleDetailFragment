@@ -34,7 +34,6 @@
 package com.raywenderlich.android.imet.ui.add
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -43,7 +42,8 @@ import android.view.*
 import android.widget.Toast
 import androidx.navigation.Navigation
 import com.raywenderlich.android.imet.R
-import com.raywenderlich.android.imet.databinding.FragmentAddPeopleBinding
+import com.raywenderlich.android.imet.databinding.FragmentDetailPeopleBinding
+import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * The Fragment to add people
@@ -51,21 +51,17 @@ import com.raywenderlich.android.imet.databinding.FragmentAddPeopleBinding
 class DetailsPeopleFragment : Fragment() {
 
 
-    private lateinit var viewModel: DetailsPeopleViewModel
+    private val viewModel: DetailsPeopleViewModel by viewModel()
+
     private var viewMode = false
     private var areFieldsLocked = true
-    private lateinit var binding: FragmentAddPeopleBinding
+    private lateinit var binding: FragmentDetailPeopleBinding
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(DetailsPeopleViewModel::class.java)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        binding = DataBindingUtil.inflate<FragmentAddPeopleBinding>(inflater, R.layout.fragment_detail_people, container, false)
+        binding = DataBindingUtil.inflate<FragmentDetailPeopleBinding>(inflater, R.layout.fragment_detail_people, container, false)
                 .apply {
                     this.lifecycleOwner = this@DetailsPeopleFragment
                     this.people = viewModel

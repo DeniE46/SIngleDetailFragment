@@ -35,8 +35,22 @@ package com.raywenderlich.android.imet
 
 import android.app.Application
 import com.raywenderlich.android.imet.data.PeopleRepository
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 class IMetApp : Application() {
+
+  override fun onCreate() {
+    super.onCreate()
+
+    startKoin {
+      androidContext(this@IMetApp)
+      androidLogger()
+      modules(peopleListModule, detailsPeopleModule)
+
+    }
+  }
 
   /**
    * Provides centralised Repository throughout the app
