@@ -41,6 +41,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.raywenderlich.android.imet.R
 import com.raywenderlich.android.imet.data.model.People
+import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.layout_list_item.view.*
 
 class PeoplesListAdapter(
@@ -81,7 +82,9 @@ class PeoplesListAdapter(
   /**
    * View for item, sets item info and click events
    */
-  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), LayoutContainer {
+    override val containerView: View?
+      get() = itemView
 
     fun bind(people: People, listener: OnItemClickListener) = with(itemView) {
       textViewName.text = people.name
