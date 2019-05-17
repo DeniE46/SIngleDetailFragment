@@ -5,3 +5,5 @@ Additionally, it has been modified to accomodate:
   2. DataBinding for DetailsFragment
   3. Moved most of the view logic into ViewModel
   4. Edit, add and view operations are unified into one "detail" screen only
+  
+  Original tutorial: https://www.raywenderlich.com/6729-android-jetpack-architecture-components-getting-started
