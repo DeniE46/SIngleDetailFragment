@@ -1,4 +1,6 @@
 # SingleDetailFragment
+[Showcase]
+
 Modified version of iMet-raywenderlich- that uses one screen only to add, edit and view items
 Additionally, it has been modified to accomodate:
   1. Koin DI
